@@ -1,8 +1,8 @@
-##citim fisierul
-data<-read.csv("MyAvis_OT_FINAL formated date.csv")
-##datele sunt in format an-luna-zi !
+##reading the file
+data<-read.csv("x.csv")
+##the dates are in year-month-day format
 
-##calculez pe 6 trimestre (1 an jumatate)
+##ccalculating consumtion for 1.5 year (6 trimesters)
 q1<-0
 q2<-0
 q3<-0
@@ -10,15 +10,19 @@ q4<-0
 q5<-0
 q6<-0
 
-##in clean_data tinem tabelul calculat cu q-uri
-
+##clean_data will hold the new quarterly consumption
 nrow(data)
 clean_data<-matrix(NA,nrow(data),7)
 
+##with i we advance in meter ID
 i<-1
-j<-0 ## cu j avansam in citirile contorului
-k<-0 ## in k tinem pozitia din noul tabel creat in clean_data
-counter<-0 ##conditie de oprire cand counter=6
+##with j we advance inside meter readings
+j<-0 
+##in k we count current ID position
+k<-0 
+##counter stops program when we already calculated 6 quarterly consumptions
+counter<-0 
+
 while(i<nrow(data))
 {
         if(i%%1000)print(i)
@@ -31,9 +35,9 @@ while(i<nrow(data))
         q4<-0
         q5<-0
         q6<-0    
-        l<-i ## cu l ne tinem dupa j (pentru consum trebuie 2 citiri consecutive)
+        ##l advances one step ahead in redings (for the consumption calculation)
+        l<-i 
         counter<-0
-        ##in counter tinem cate quartere am calculat
         while(paste(data$ID[i])==paste(data$ID[j]))
         {
                 date1<-as.POSIXct(data[l,5])
@@ -50,7 +54,8 @@ while(i<nrow(data))
                 print(ydif)
                 print(dif)
                 print("--------------")
-                ##tratam cazul citit la 3 luni
+              
+                ##the case when we have quarterly readingds (each 3 months)
                 if(qdif==dif)
                 {
                         if(counter<6)
@@ -66,7 +71,7 @@ while(i<nrow(data))
                         counter<-counter+1
                 }
                 else 
-                        ##tratam cazul citit la jumatate de an
+                       ## the case when we have 2 readings a year
                         if(hdif==dif)
                         {
                                 if (counter<6)
@@ -82,7 +87,7 @@ while(i<nrow(data))
                                 counter<-counter+2
                         }
                 else
-                        ##tratam cazul citit la un an
+                       ## the case when we have only one readings a year
                         if(ydif==dif)
                         {
                                 if(counter<6)
@@ -95,7 +100,7 @@ while(i<nrow(data))
                                         q6<-(as.numeric(data$Index[j])-as.numeric(data$Index[l]))/as.numeric(date2-date1)*0.25
                                         
                                 }  
-                                counter<-counter+3
+                                counter<-counter+4
                         }
                 
                 l<-l+1
@@ -111,5 +116,5 @@ while(i<nrow(data))
         i<-j
 }
 
-## salvam in csv
-write.csv(clean_data,"date suspecti.csv")
+##save the resulting file
+write.csv(clean_data,"y.csv")
